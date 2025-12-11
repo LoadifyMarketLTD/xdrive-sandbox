@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router'
 import Head from 'next/head'
+import Link from 'next/link'
 import LanguageSwitcher from '../components/LanguageSwitcher'
 
 export default function Home() {
@@ -117,12 +118,12 @@ export default function Home() {
                 {t.documentation}
               </p>
               <div className="flex gap-4">
-                <a 
+                <Link 
                   href="/about" 
                   className="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition-colors"
                 >
                   {t.aboutLink}
-                </a>
+                </Link>
                 <a 
                   href="/api/hello" 
                   className="inline-block bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
