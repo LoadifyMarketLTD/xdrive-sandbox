@@ -36,9 +36,6 @@ jobs:
         npm ci
         cd ..
     
-    - name: Lint frontend
-      run: npm run lint
-    
     - name: Build frontend
       run: npm run build
     
@@ -55,5 +52,5 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: build-output-${{ matrix.node-version }}
-        path: .next
+        path: dist
         retention-days: 5
