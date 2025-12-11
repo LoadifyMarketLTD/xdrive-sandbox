@@ -1,23 +1,20 @@
-# xdrive-sandbox
+# XDrive Logistics UI Mock
 
-A logistics marketplace demo application built with Next.js, React, and Tailwind CSS. This sandbox environment demonstrates modern web development practices including internationalization, API integration, and responsive design.
+A functional React + Vite UI mock for XDrive Logistics that replicates core logistics platform screens. This is a standalone demo application with mock data that runs locally without external API keys.
 
 ## Features
 
-- **Next.js 13** - React framework with server-side rendering
-- **React 18** - Modern UI library
-- **Tailwind CSS** - Utility-first CSS framework
-- **i18n Support** - Multi-language support (English, French, German, Romanian)
-- **API Routes** - Backend API endpoints
-- **CI/CD** - GitHub Actions workflow for automated testing and builds
+- **React 18** - Modern UI library with hooks
+- **Vite** - Lightning-fast build tool and dev server
+- **Mock Data** - Self-contained with sample job listings
+- **Responsive Design** - Works on desktop and mobile devices
+- **Multiple Screens** - Jobs list, Live Tracking, Post a Job form, and Profile
 
 ## Tech Stack
 
-- Next.js 13.5.6
 - React 18.2.0
-- Tailwind CSS 3.3.5
-- PostCSS & Autoprefixer
-- ESLint
+- Vite 4.3.9
+- Pure CSS (no additional frameworks)
 
 ## Getting Started
 
@@ -44,78 +41,85 @@ npm install
 npm run dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
+4. Open [http://localhost:5173](http://localhost:5173) in your browser to see the application.
 
 ### Available Scripts
 
-- `npm run dev` - Start development server
+- `npm run dev` - Start Vite development server at http://localhost:5173
 - `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
+- `npm run preview` - Preview production build locally
 
-## Testing Locales
+## Application Screens
 
-The application supports 4 locales: English (en), French (fr), German (de), and Romanian (ro).
+### 1. Jobs List
+Displays available logistics jobs with details including:
+- Job title and description
+- Pickup and delivery locations
+- Distance and price
+- Current status (Active, Pending, Completed)
+- Assigned driver (if applicable)
 
-To test different locales:
-1. Run the development server (`npm run dev`)
-2. Use the language switcher in the navigation bar
-3. Or access directly via URL:
-   - English: http://localhost:3000/
-   - French: http://localhost:3000/fr
-   - German: http://localhost:3000/de
-   - Romanian: http://localhost:3000/ro
+### 2. Live Tracking
+Mock real-time tracking interface featuring:
+- Static map placeholder (no API keys needed)
+- Current assignment details
+- Driver information
+- Progress bar showing delivery status
+- Estimated time of arrival (ETA)
+
+### 3. Post a Job
+Form for creating new logistics jobs with fields for:
+- Pickup location
+- Delivery location
+- Weight and dimensions
+- Item description
+- Mock submission (shows alert on submit)
+
+### 4. Profile
+User profile section displaying:
+- User information
+- Statistics (total, active, and completed jobs)
+- Current active job card
 
 ## Project Structure
 
 ```
 xdrive-sandbox/
-├── .github/
-│   ├── workflows/
-│   │   └── ci.yml
-│   └── ISSUE_TEMPLATE/
-│       ├── bug_report.md
-│       └── feature_request.md
-├── components/
-│   └── LanguageSwitcher.js
-├── pages/
-│   ├── api/
-│   │   └── hello.js
-│   ├── _app.js
-│   ├── index.js
-│   └── about.js
-├── public/
-│   └── locales/
-│       ├── en/common.json
-│       ├── fr/common.json
-│       ├── de/common.json
-│       └── ro/common.json
-├── styles/
-│   └── globals.css
-├── .gitignore
-├── next.config.js
-├── tailwind.config.js
-├── postcss.config.js
-├── package.json
-└── README.md
+├── src/
+│   ├── components/
+│   │   └── JobCard.jsx      # Reusable job card component
+│   ├── App.jsx               # Main application with all screens
+│   ├── main.jsx              # React app entry point
+│   └── styles.css            # Application styles
+├── index.html                # HTML entry point
+├── vite.config.js            # Vite configuration
+├── package.json              # Dependencies and scripts
+└── README.md                 # This file
 ```
 
-## API Endpoints
+## Mock Data
 
-- `/api/hello` - Sample API endpoint that returns JSON with timestamp and locale information
+The application uses mock data defined in `src/App.jsx`. No external APIs or databases are required. This makes it perfect for:
+- UI/UX demonstrations
+- Frontend development without backend dependencies
+- Quick prototyping and testing
+- Design reviews and stakeholder presentations
 
-## Pull Request Checklist
+## Future Enhancements
 
-Before submitting a pull request, ensure:
+This mock serves as a foundation for integrating:
+- Real-time maps (Google Maps, Mapbox, etc.)
+- Signature capture for proof of delivery
+- Photo/document upload functionality
+- Backend API integration
+- User authentication
+- WebSocket for live tracking updates
 
-- [ ] Code follows the project's coding standards
-- [ ] All tests pass (`npm run build` succeeds)
-- [ ] ESLint shows no errors (`npm run lint`)
-- [ ] New features include appropriate documentation
-- [ ] Commit messages are clear and descriptive
-- [ ] Branch is up to date with the base branch
-- [ ] No unrelated changes are included
-- [ ] Localization files are updated if UI text changes
+## Notes
+
+- **No API Keys Required**: Maps are mocked with placeholders, so there's no risk of billing or key management
+- **Self-Contained**: All data is local mock data
+- **Easy to Extend**: Clean component structure makes it simple to add real integrations later
 
 ## Contributing
 
