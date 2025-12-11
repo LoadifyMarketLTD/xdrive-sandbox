@@ -1,30 +1,38 @@
 # xdrive-sandbox
 
-A logistics marketplace demo application built with Next.js, React, and Tailwind CSS. This sandbox environment demonstrates modern web development practices including internationalization, API integration, and responsive design.
+A full-stack logistics platform demo application built with React, Vite, and Express. This sandbox environment demonstrates modern web development practices including real-time tracking, proof of delivery, photo uploads, and API integration.
 
 ## Features
 
-- **Next.js 13** - React framework with server-side rendering
-- **React 18** - Modern UI library
-- **Tailwind CSS** - Utility-first CSS framework
-- **i18n Support** - Multi-language support (English, French, German, Romanian)
-- **API Routes** - Backend API endpoints
-- **CI/CD** - GitHub Actions workflow for automated testing and builds
+- **React 18** - Modern UI library with hooks
+- **Vite** - Fast build tool and dev server
+- **Leaflet Maps** - Interactive route tracking with OpenStreetMap
+- **Signature Capture** - Digital signature pad for proof of delivery
+- **Photo Upload** - Drag-and-drop photo upload with preview
+- **Express Backend** - RESTful API with file upload support
+- **CI/CD** - GitHub Actions workflow for automated builds
 
 ## Tech Stack
 
-- Next.js 13.5.6
+### Frontend
 - React 18.2.0
-- Tailwind CSS 3.3.5
-- PostCSS & Autoprefixer
-- ESLint
+- Vite 5.0.5
+- Leaflet 1.9.4 & React-Leaflet 4.2.1
+- Axios 1.6.2
+- React-Signature-Canvas 1.0.6
+- React-Dropzone 14.2.3
+
+### Backend
+- Express 4.18.2
+- Multer 1.4.5 (file uploads)
+- CORS 2.8.5
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 18.x or higher
-- npm or yarn
+- npm
 
 ### Installation
 
@@ -34,75 +42,131 @@ git clone https://github.com/LoadifyMarketLTD/xdrive-sandbox.git
 cd xdrive-sandbox
 ```
 
-2. Install dependencies:
+2. Install frontend dependencies:
 ```bash
 npm install
 ```
 
-3. Run the development server:
+3. Install backend dependencies:
+```bash
+cd server
+npm install
+cd ..
+```
+
+### Running the Application
+
+#### Option 1: Run frontend and backend separately
+
+Terminal 1 (Frontend):
 ```bash
 npm run dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
+Terminal 2 (Backend):
+```bash
+npm run start:server
+```
+
+#### Option 2: Run both concurrently
+```bash
+npm run dev:full
+```
+
+4. Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ### Available Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
+#### Root Level
+- `npm run dev` - Start Vite dev server (frontend only)
+- `npm run build` - Build frontend for production
+- `npm run preview` - Preview production build
+- `npm run start:server` - Start Express backend server
+- `npm run dev:server` - Start backend with nodemon (auto-reload)
+- `npm run dev:full` - Run both frontend and backend concurrently
 
-## Testing Locales
+#### Server Level (cd server)
+- `npm start` - Start Express server
+- `npm run dev` - Start server with nodemon
 
-The application supports 4 locales: English (en), French (fr), German (de), and Romanian (ro).
+## Testing the Application
 
-To test different locales:
-1. Run the development server (`npm run dev`)
-2. Use the language switcher in the navigation bar
-3. Or access directly via URL:
-   - English: http://localhost:3000/
-   - French: http://localhost:3000/fr
-   - German: http://localhost:3000/de
-   - Romanian: http://localhost:3000/ro
+### Manual Testing Steps
+
+1. **Checkout and setup:**
+   ```bash
+   git checkout -b feat/full-ui-stack origin/main
+   npm install
+   cd server && npm install && cd ..
+   ```
+
+2. **Start the application:**
+   ```bash
+   npm run dev:full
+   ```
+   Or in separate terminals:
+   ```bash
+   # Terminal 1
+   npm run dev
+   
+   # Terminal 2
+   npm run start:server
+   ```
+
+3. **Verify functionality:**
+   - Open http://localhost:5173
+   - **Live Tracking**: Verify the map renders with markers and a polyline route from Manchester → Birmingham → London
+   - **Jobs List**: Verify the jobs list displays on the left side
+   - **Proof of Delivery**:
+     - Click "Proof of Delivery" on any job card
+     - Draw a signature in the signature pad
+     - Click "Save Signature"
+     - Upload a photo by dragging/dropping or clicking to select
+     - Click "Submit POD"
+     - Verify signature is saved to `server/uploads/signatures/`
+     - Verify photo is saved to `server/uploads/photos/`
+   - **API Integration**: Jobs list should load from GET /api/jobs when server is running
+
+4. **Fallback mode**: Stop the backend server and refresh the page - the app should show a warning banner and use mock data.
 
 ## Project Structure
 
 ```
 xdrive-sandbox/
 ├── .github/
-│   ├── workflows/
-│   │   └── ci.yml
-│   └── ISSUE_TEMPLATE/
-│       ├── bug_report.md
-│       └── feature_request.md
-├── components/
-│   └── LanguageSwitcher.js
-├── pages/
-│   ├── api/
-│   │   └── hello.js
-│   ├── _app.js
+│   └── workflows/
+│       ├── ci.yml
+│       └── nodejs.yml
+├── src/
+│   ├── components/
+│   │   ├── JobCard.jsx
+│   │   ├── MapRoute.jsx
+│   │   ├── SignaturePad.jsx
+│   │   └── PhotoUpload.jsx
+│   ├── App.jsx
+│   ├── main.jsx
+│   └── styles.css
+├── server/
+│   ├── uploads/
+│   │   ├── signatures/
+│   │   └── photos/
 │   ├── index.js
-│   └── about.js
-├── public/
-│   └── locales/
-│       ├── en/common.json
-│       ├── fr/common.json
-│       ├── de/common.json
-│       └── ro/common.json
-├── styles/
-│   └── globals.css
-├── .gitignore
-├── next.config.js
-├── tailwind.config.js
-├── postcss.config.js
+│   └── package.json
+├── index.html
+├── vite.config.js
 ├── package.json
 └── README.md
 ```
 
 ## API Endpoints
 
-- `/api/hello` - Sample API endpoint that returns JSON with timestamp and locale information
+### Backend Server (http://localhost:3001)
+
+- `GET /api/jobs` - Get all jobs
+- `POST /api/jobs` - Create a new job
+- `POST /api/upload/signature` - Upload signature as base64 PNG
+- `POST /api/upload/photo` - Upload photo file (multipart/form-data)
+- `GET /api/health` - Health check endpoint
 
 ## Pull Request Checklist
 
