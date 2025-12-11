@@ -2,6 +2,7 @@ import React from 'react'
 
 function JobCard({ job }) {
   const getStatusClass = (status) => {
+    if (!status) return ''
     switch (status.toLowerCase()) {
       case 'available':
         return 'status-available'
@@ -15,6 +16,7 @@ function JobCard({ job }) {
   }
 
   const getUrgencyClass = (urgency) => {
+    if (!urgency) return 'urgency-badge'
     return urgency.toLowerCase() === 'urgent' ? 'urgency-badge urgent' : 'urgency-badge'
   }
 

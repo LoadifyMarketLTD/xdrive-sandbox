@@ -12,7 +12,7 @@ A functional UI mock for XDrive Logistics platform built with React and Vite. Th
 ## Tech Stack
 
 - **React 18.2.0** - UI library
-- **Vite 5.0.0** - Build tool and dev server
+- **Vite 5.0.12** - Build tool and dev server
 - **Pure CSS** - Styling with modern gradients and animations
 
 ## Prerequisites

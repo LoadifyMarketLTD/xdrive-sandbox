@@ -69,6 +69,8 @@ function App() {
 
   const handleSubmitJob = (e) => {
     e.preventDefault()
+    // Using alert for mock demonstration as specified in requirements
+    // In production, replace with toast notification or modal component
     alert(`Job Posted Successfully!\n\nTitle: ${formData.title}\nPickup: ${formData.pickup}\nDropoff: ${formData.dropoff}\nWeight: ${formData.weight} kg\nDescription: ${formData.description}`)
     // Reset form
     setFormData({
