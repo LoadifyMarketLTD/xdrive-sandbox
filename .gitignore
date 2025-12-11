@@ -10,8 +10,16 @@
 /.next/
 /out/
 
+# vite
+/dist
+/.vite
+
 # production
 /build
+
+# uploads
+/server/uploads/*
+!/server/uploads/.gitkeep
 
 # misc
 .DS_Store

@@ -37,9 +37,6 @@ jobs:
           npm install
         fi
     
-    - name: Run ESLint
-      run: npm run lint
-    
     - name: Build project
       run: npm run build
     
@@ -47,5 +44,5 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: build-output
-        path: .next
+        path: dist
         retention-days: 5

@@ -1,30 +1,38 @@
 # xdrive-sandbox
 
-A logistics marketplace demo application built with Next.js, React, and Tailwind CSS. This sandbox environment demonstrates modern web development practices including internationalization, API integration, and responsive design.
+A full-stack UI mock application demonstrating a logistics delivery interface with interactive map, signature capture, and photo upload capabilities. Built with React, Vite, and Express - requires no external API keys to run.
 
 ## Features
 
-- **Next.js 13** - React framework with server-side rendering
-- **React 18** - Modern UI library
-- **Tailwind CSS** - Utility-first CSS framework
-- **i18n Support** - Multi-language support (English, French, German, Romanian)
-- **API Routes** - Backend API endpoints
-- **CI/CD** - GitHub Actions workflow for automated testing and builds
+- **React 18** - Modern UI library with hooks
+- **Vite** - Lightning-fast build tool and dev server
+- **Leaflet Map** - Interactive OpenStreetMap integration
+- **Signature Capture** - Digital signature collection
+- **Photo Upload** - Drag-and-drop file upload with preview
+- **Express Backend** - Mock API endpoints for testing
+- **CI/CD** - GitHub Actions workflow for automated builds
 
 ## Tech Stack
 
-- Next.js 13.5.6
+### Frontend
 - React 18.2.0
-- Tailwind CSS 3.3.5
-- PostCSS & Autoprefixer
-- ESLint
+- Vite 5.0.0
+- Leaflet 1.9.4 + React-Leaflet 4.2.1
+- React Signature Canvas 1.0.6
+- React Dropzone 14.2.3
+- Axios 1.4.0
+
+### Backend
+- Express 4.18.2
+- Multer (file uploads)
+- CORS enabled
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 18.x or higher
-- npm or yarn
+- npm
 
 ### Installation
 
@@ -39,83 +47,101 @@ cd xdrive-sandbox
 npm install
 ```
 
-3. Run the development server:
+3. Start the full stack (frontend + backend):
+```bash
+npm run dev:full
+```
+
+Or run them separately:
+
+**Frontend only** (Vite dev server):
 ```bash
 npm run dev
 ```
+Open [http://localhost:3000](http://localhost:3000)
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
+**Backend only** (Express server):
+```bash
+npm run start:server
+```
+Server runs on [http://localhost:3001](http://localhost:3001)
 
 ### Available Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
+- `npm run dev` - Start Vite frontend dev server (port 3000)
+- `npm run build` - Build frontend for production
+- `npm run preview` - Preview production build
+- `npm run start:server` - Start Express backend server (port 3001)
+- `npm run dev:server` - Start backend with nodemon (auto-restart)
+- `npm run dev:full` - Run both frontend and backend concurrently
 
-## Testing Locales
+## Features Overview
 
-The application supports 4 locales: English (en), French (fr), German (de), and Romanian (ro).
+### 📍 Interactive Map
+- OpenStreetMap integration via Leaflet
+- Draggable markers for delivery locations
+- No API keys required
 
-To test different locales:
-1. Run the development server (`npm run dev`)
-2. Use the language switcher in the navigation bar
-3. Or access directly via URL:
-   - English: http://localhost:3000/
-   - French: http://localhost:3000/fr
-   - German: http://localhost:3000/de
-   - Romanian: http://localhost:3000/ro
+### ✍️ Signature Capture
+- HTML5 canvas-based signature pad
+- Clear and save functionality
+- Exports to PNG format
+
+### 📷 Photo Upload
+- Drag-and-drop interface
+- Multiple file support
+- Preview uploaded files
+- Automatic validation (images only, 5MB max)
 
 ## Project Structure
 
 ```
 xdrive-sandbox/
 ├── .github/
-│   ├── workflows/
-│   │   └── ci.yml
-│   └── ISSUE_TEMPLATE/
-│       ├── bug_report.md
-│       └── feature_request.md
-├── components/
-│   └── LanguageSwitcher.js
-├── pages/
-│   ├── api/
-│   │   └── hello.js
-│   ├── _app.js
-│   ├── index.js
-│   └── about.js
-├── public/
-│   └── locales/
-│       ├── en/common.json
-│       ├── fr/common.json
-│       ├── de/common.json
-│       └── ro/common.json
-├── styles/
-│   └── globals.css
-├── .gitignore
-├── next.config.js
-├── tailwind.config.js
-├── postcss.config.js
-├── package.json
+│   └── workflows/
+│       └── ci.yml          # GitHub Actions CI/CD
+├── server/
+│   ├── index.js            # Express backend
+│   └── uploads/            # File upload directory
+├── src/
+│   ├── App.jsx             # Main React component
+│   ├── main.jsx            # React entry point
+│   └── styles.css          # Global styles
+├── index.html              # HTML entry point
+├── vite.config.js          # Vite configuration
+├── package.json            # Dependencies and scripts
 └── README.md
 ```
 
-## API Endpoints
+## Backend API Endpoints
 
-- `/api/hello` - Sample API endpoint that returns JSON with timestamp and locale information
+The Express server provides mock endpoints:
+
+- `GET /api/health` - Health check endpoint
+- `POST /api/upload` - Photo upload endpoint (multipart/form-data)
+- `POST /api/signature` - Signature data endpoint (JSON)
+- `GET /api/deliveries` - Mock delivery data
+
+## Development Notes
+
+- Frontend runs on port 3000
+- Backend runs on port 3001
+- CORS is enabled for local development
+- Uploaded files are stored in `server/uploads/`
+- No external API keys or services required
+- Map tiles are served from OpenStreetMap's free tile server
 
 ## Pull Request Checklist
 
 Before submitting a pull request, ensure:
 
 - [ ] Code follows the project's coding standards
-- [ ] All tests pass (`npm run build` succeeds)
-- [ ] ESLint shows no errors (`npm run lint`)
+- [ ] Build succeeds (`npm run build`)
+- [ ] Both frontend and backend start without errors
 - [ ] New features include appropriate documentation
 - [ ] Commit messages are clear and descriptive
 - [ ] Branch is up to date with the base branch
 - [ ] No unrelated changes are included
-- [ ] Localization files are updated if UI text changes
 
 ## Contributing
 
