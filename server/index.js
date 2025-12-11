@@ -95,6 +95,7 @@ app.post('/api/jobs', (req, res) => {
 })
 
 // Upload signature (base64 image)
+// NOTE: In production, implement rate limiting (e.g., express-rate-limit) to prevent abuse
 app.post('/api/upload/signature', (req, res) => {
   try {
     const { image, jobId } = req.body
@@ -126,6 +127,7 @@ app.post('/api/upload/signature', (req, res) => {
 })
 
 // Upload photo (multipart form data)
+// NOTE: In production, implement rate limiting (e.g., express-rate-limit) to prevent abuse
 app.post('/api/upload/photo', upload.single('photo'), (req, res) => {
   try {
     if (!req.file) {
