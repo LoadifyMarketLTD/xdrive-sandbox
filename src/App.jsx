@@ -147,7 +147,7 @@ function App() {
                 <div className="tracking-details">
                   <p><strong>Job:</strong> Express Delivery - Electronics</p>
                   <p><strong>Driver:</strong> John Smith</p>
-                  <p><strong>Status:</strong> <span className="status-active">En Route</span></p>
+                  <p><strong>Status:</strong> <span className="tracking-status">En Route</span></p>
                   <p><strong>From:</strong> London, UK</p>
                   <p><strong>To:</strong> Manchester, UK</p>
                   <p><strong>ETA:</strong> 2h 45m</p>
