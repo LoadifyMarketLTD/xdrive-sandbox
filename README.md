@@ -1,23 +1,20 @@
-# xdrive-sandbox
+# XDrive UI Mock
 
-A logistics marketplace demo application built with Next.js, React, and Tailwind CSS. This sandbox environment demonstrates modern web development practices including internationalization, API integration, and responsive design.
+A functional React + Vite UI mock for XDrive Logistics that demonstrates the core screens without requiring external API keys or backend services.
 
 ## Features
 
-- **Next.js 13** - React framework with server-side rendering
-- **React 18** - Modern UI library
-- **Tailwind CSS** - Utility-first CSS framework
-- **i18n Support** - Multi-language support (English, French, German, Romanian)
-- **API Routes** - Backend API endpoints
-- **CI/CD** - GitHub Actions workflow for automated testing and builds
+- **Jobs List** - Mobile-style job cards showing routes and pricing
+- **Live Tracking Mock** - Map placeholder with route assignment details
+- **Post a Job Form** - Complete job posting form with validation
+- **Profile Card** - Driver profile with status
+- **Active Job Card** - Current job details display
 
 ## Tech Stack
 
-- Next.js 13.5.6
 - React 18.2.0
-- Tailwind CSS 3.3.5
-- PostCSS & Autoprefixer
-- ESLint
+- Vite 5.0.0
+- Pure CSS (no framework dependencies)
 
 ## Getting Started
 
@@ -44,78 +41,86 @@ npm install
 npm run dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
+4. Open [http://localhost:5173](http://localhost:5173) in your browser to see the result.
 
 ### Available Scripts
 
-- `npm run dev` - Start development server
+- `npm run dev` - Start Vite development server (default port: 5173)
 - `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-
-## Testing Locales
-
-The application supports 4 locales: English (en), French (fr), German (de), and Romanian (ro).
-
-To test different locales:
-1. Run the development server (`npm run dev`)
-2. Use the language switcher in the navigation bar
-3. Or access directly via URL:
-   - English: http://localhost:3000/
-   - French: http://localhost:3000/fr
-   - German: http://localhost:3000/de
-   - Romanian: http://localhost:3000/ro
+- `npm run preview` - Preview production build locally
 
 ## Project Structure
 
 ```
 xdrive-sandbox/
-├── .github/
-│   ├── workflows/
-│   │   └── ci.yml
-│   └── ISSUE_TEMPLATE/
-│       ├── bug_report.md
-│       └── feature_request.md
-├── components/
-│   └── LanguageSwitcher.js
-├── pages/
-│   ├── api/
-│   │   └── hello.js
-│   ├── _app.js
-│   ├── index.js
-│   └── about.js
-├── public/
-│   └── locales/
-│       ├── en/common.json
-│       ├── fr/common.json
-│       ├── de/common.json
-│       └── ro/common.json
-├── styles/
-│   └── globals.css
-├── .gitignore
-├── next.config.js
-├── tailwind.config.js
-├── postcss.config.js
-├── package.json
-└── README.md
+├── src/
+│   ├── components/
+│   │   └── JobCard.jsx       # Reusable job card component
+│   ├── App.jsx                # Main application component
+│   ├── main.jsx               # React entry point
+│   └── styles.css             # Complete application styles
+├── index.html                 # HTML entry point
+├── package.json               # Dependencies and scripts
+└── README.md                  # This file
 ```
 
-## API Endpoints
+## Features Overview
 
-- `/api/hello` - Sample API endpoint that returns JSON with timestamp and locale information
+### Jobs List
+Displays a list of available jobs with:
+- Date and route information
+- Origin and destination cities
+- Provider and price details
 
-## Pull Request Checklist
+### Live Tracking (Mock)
+Shows a mock tracking interface with:
+- Map placeholder for future integration
+- Driver assignment information
+- Collection and delivery addresses
+- Job reference number
 
-Before submitting a pull request, ensure:
+### Post a Job Form
+Complete form for posting new jobs with fields for:
+- Pickup and delivery locations
+- Pickup and delivery dates
+- Vehicle type selection
+- Payment amount
+- Reference number
+- Additional notes
 
-- [ ] Code follows the project's coding standards
-- [ ] All tests pass (`npm run build` succeeds)
-- [ ] ESLint shows no errors (`npm run lint`)
-- [ ] New features include appropriate documentation
-- [ ] Commit messages are clear and descriptive
-- [ ] Branch is up to date with the base branch
-- [ ] No unrelated changes are included
-- [ ] Localization files are updated if UI text changes
+### Profile & Active Job
+Sidebar displaying:
+- Driver profile with avatar
+- Online/offline status toggle
+- Current active job details with timing
+
+## Development Notes
+
+- All data is mocked - no external APIs required
+- Forms show alerts on submission (mock behavior)
+- Ready for integration with real backend services
+- Maps can be replaced with real mapping libraries (Leaflet, Mapbox, Google Maps)
+- Responsive design works on mobile and desktop
+
+## Future Enhancements
+
+Potential additions for future iterations:
+- Real-time map integration (Leaflet, Mapbox, or Google Maps)
+- Signature capture functionality
+- Photo upload for proof of delivery
+- Backend API integration
+- Real-time WebSocket updates for tracking
+- Authentication and user management
+
+## Testing
+
+To test the UI mock:
+1. Start the development server with `npm run dev`
+2. Navigate to http://localhost:5173
+3. Verify the Jobs list displays three sample jobs
+4. Check the Live Tracking section shows map placeholder and details
+5. Fill out the Post a Job form and submit to see alert confirmation
+6. Test responsive design by resizing browser window
 
 ## Contributing
 
