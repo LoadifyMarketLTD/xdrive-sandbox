@@ -26,6 +26,7 @@ body{font-family:Inter, system-ui, Arial; margin:0; background:#f5f7fa; color:#1
 
 .card{background:var(--card); border-radius:var(--radius); padding:18px; box-shadow:0 6px 18px rgba(16,24,40,0.05); margin-bottom:18px}
 .profile .avatar{width:80px;height:80px;border-radius:50%;background:#dfe9ee;margin-bottom:12px}
+.muted{color:var(--muted)}
 
 .btn{padding:10px 14px;border-radius:8px;border:0; cursor:pointer}
 .btn.primary{background:#3b82f6;color:#fff}
