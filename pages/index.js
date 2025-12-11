@@ -1,4 +1,5 @@
 import { useRouter } from 'next/router'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 export default function Home() {
@@ -40,18 +41,18 @@ export default function Home() {
               {messages.switchLocale || 'Switch locale using the links below:'}
             </p>
             <div className="flex flex-wrap gap-4">
-              <a href="/" locale="en" className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+              <Link href="/" locale="en" className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
                 English
-              </a>
-              <a href="/fr" className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+              </Link>
+              <Link href="/" locale="fr" className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
                 Français
-              </a>
-              <a href="/de" className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+              </Link>
+              <Link href="/" locale="de" className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
                 Deutsch
-              </a>
-              <a href="/ro" className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+              </Link>
+              <Link href="/" locale="ro" className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
                 Română
-              </a>
+              </Link>
             </div>
           </div>
 
