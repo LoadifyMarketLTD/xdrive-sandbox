@@ -1,0 +1,13 @@
+{
+  "title": "Bun venit la xDrive Sandbox",
+  "welcome": "Bun venit la Next.js cu i18n!",
+  "description": "Aceasta este o aplicație demo cu suport de internaționalizare pentru engleză, franceză, germană și română.",
+  "features": {
+    "docs": "Documentație",
+    "docsDesc": "Găsiți informații detaliate despre funcțiile și API-ul Next.js.",
+    "learn": "Învață",
+    "learnDesc": "Învățați despre Next.js într-un curs interactiv cu chestionare!",
+    "deploy": "Implementare",
+    "deployDesc": "Implementați instantaneu site-ul Next.js pe un URL public cu Vercel."
+  }
+}

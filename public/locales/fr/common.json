@@ -1,0 +1,13 @@
+{
+  "title": "Bienvenue sur xDrive Sandbox",
+  "welcome": "Bienvenue sur Next.js avec i18n!",
+  "description": "Il s'agit d'une application de démonstration avec prise en charge de l'internationalisation pour l'anglais, le français, l'allemand et le roumain.",
+  "features": {
+    "docs": "Documentation",
+    "docsDesc": "Trouvez des informations détaillées sur les fonctionnalités et l'API de Next.js.",
+    "learn": "Apprendre",
+    "learnDesc": "Apprenez Next.js dans un cours interactif avec des quiz!",
+    "deploy": "Déployer",
+    "deployDesc": "Déployez instantanément votre site Next.js sur une URL publique avec Vercel."
+  }
+}
