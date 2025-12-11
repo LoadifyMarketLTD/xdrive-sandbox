@@ -8,10 +8,13 @@ export default function Home() {
 
   useEffect(() => {
     // Load translations for the current locale
-    fetch(`/locales/${locale}/common.json`)
+    const allowedLocales = ['en', 'fr', 'de', 'ro']
+    const safeLocale = allowedLocales.includes(locale) ? locale : 'en'
+    
+    fetch(`/locales/${safeLocale}/common.json`)
       .then(res => res.json())
       .then(data => setTranslations(data))
-      .catch(err => console.error('Failed to load translations:', err))
+      .catch(err => console.error(`Failed to load translations for locale '${safeLocale}':`, err))
   }, [locale])
 
   const changeLocale = (newLocale) => {
