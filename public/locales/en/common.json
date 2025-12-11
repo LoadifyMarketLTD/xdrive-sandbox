@@ -1,0 +1,7 @@
+{
+  "welcome": "Welcome to xDrive Sandbox",
+  "description": "A Next.js demo with Tailwind CSS and i18n support",
+  "currentLocale": "Current Locale",
+  "switchLocale": "Switch locale using the links below:",
+  "features": "Features"
+}

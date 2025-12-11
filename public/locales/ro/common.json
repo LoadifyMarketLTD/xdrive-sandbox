@@ -1,0 +1,7 @@
+{
+  "welcome": "Bun venit la xDrive Sandbox",
+  "description": "O demonstrație Next.js cu Tailwind CSS și suport i18n",
+  "currentLocale": "Localizare curentă",
+  "switchLocale": "Schimbați localizarea folosind linkurile de mai jos:",
+  "features": "Caracteristici"
+}
