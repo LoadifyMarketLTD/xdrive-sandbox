@@ -35,3 +35,7 @@ next-env.d.ts
 # logs
 logs
 *.log
+
+# server
+/server/node_modules
+/server/uploads

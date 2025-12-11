@@ -2,17 +2,34 @@ import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 import LanguageSwitcher from '../components/LanguageSwitcher'
+import JobCard from '../components/JobCard'
 
-// Dynamically import MapRoute with no SSR (Leaflet requires window object)
+// Dynamically import components with no SSR (they require window/browser APIs)
 const MapRoute = dynamic(() => import('../components/MapRoute'), {
   ssr: false,
   loading: () => <div className="w-full h-[400px] md:h-[500px] bg-gray-200 rounded-lg flex items-center justify-center">Loading map...</div>
 })
 
+const SignaturePad = dynamic(() => import('../components/SignaturePad'), {
+  ssr: false,
+  loading: () => <div className="p-4">Loading signature pad...</div>
+})
+
+const PhotoUpload = dynamic(() => import('../components/PhotoUpload'), {
+  ssr: false,
+  loading: () => <div className="p-4">Loading photo upload...</div>
+})
+
 export default function Home() {
   const router = useRouter()
   const { locale } = router
+  const [jobs, setJobs] = useState([])
+  const [loadingJobs, setLoadingJobs] = useState(true)
+  const [showPODModal, setShowPODModal] = useState(false)
+  const [selectedJobId, setSelectedJobId] = useState(null)
   
   const translations = {
     en: {
@@ -31,7 +48,15 @@ export default function Home() {
       aboutLink: 'About Page',
       testApi: 'Test API',
       liveTracking: 'Live Tracking',
-      trackingDescription: 'Track your shipment in real-time from collection to delivery'
+      trackingDescription: 'Track your shipment in real-time from collection to delivery',
+      jobs: 'Active Jobs',
+      jobsDescription: 'Current delivery jobs from the backend',
+      proofOfDelivery: 'Proof of Delivery',
+      podDescription: 'Capture signature and photo for delivery confirmation',
+      openPOD: 'Open Proof of Delivery',
+      closePOD: 'Close',
+      signature: 'Signature',
+      photoUpload: 'Photo Upload'
     },
     fr: {
       title: 'Bienvenue sur xdrive-sandbox',
@@ -49,7 +74,15 @@ export default function Home() {
       aboutLink: 'Page À propos',
       testApi: 'Tester API',
       liveTracking: 'Suivi en Direct',
-      trackingDescription: 'Suivez votre expédition en temps réel de la collecte à la livraison'
+      trackingDescription: 'Suivez votre expédition en temps réel de la collecte à la livraison',
+      jobs: 'Tâches Actives',
+      jobsDescription: 'Tâches de livraison actuelles du backend',
+      proofOfDelivery: 'Preuve de Livraison',
+      podDescription: 'Capturez la signature et la photo pour la confirmation de livraison',
+      openPOD: 'Ouvrir Preuve de Livraison',
+      closePOD: 'Fermer',
+      signature: 'Signature',
+      photoUpload: 'Télécharger Photo'
     },
     de: {
       title: 'Willkommen bei xdrive-sandbox',
@@ -67,7 +100,15 @@ export default function Home() {
       aboutLink: 'Über-Seite',
       testApi: 'API testen',
       liveTracking: 'Live-Verfolgung',
-      trackingDescription: 'Verfolgen Sie Ihre Sendung in Echtzeit von der Abholung bis zur Lieferung'
+      trackingDescription: 'Verfolgen Sie Ihre Sendung in Echtzeit von der Abholung bis zur Lieferung',
+      jobs: 'Aktive Aufträge',
+      jobsDescription: 'Aktuelle Lieferaufträge vom Backend',
+      proofOfDelivery: 'Liefernachweis',
+      podDescription: 'Unterschrift und Foto zur Lieferbestätigung erfassen',
+      openPOD: 'Liefernachweis Öffnen',
+      closePOD: 'Schließen',
+      signature: 'Unterschrift',
+      photoUpload: 'Foto Hochladen'
     },
     ro: {
       title: 'Bun venit la xdrive-sandbox',
@@ -85,11 +126,38 @@ export default function Home() {
       aboutLink: 'Pagina Despre',
       testApi: 'Testează API',
       liveTracking: 'Urmărire Live',
-      trackingDescription: 'Urmăriți transportul dvs. în timp real de la colectare la livrare'
+      trackingDescription: 'Urmăriți transportul dvs. în timp real de la colectare la livrare',
+      jobs: 'Sarcini Active',
+      jobsDescription: 'Sarcinile de livrare curente de la backend',
+      proofOfDelivery: 'Dovada Livrării',
+      podDescription: 'Capturați semnătura și fotografia pentru confirmarea livrării',
+      openPOD: 'Deschide Dovada Livrării',
+      closePOD: 'Închide',
+      signature: 'Semnătură',
+      photoUpload: 'Încarcă Fotografie'
     }
   }
 
   const t = translations[locale] || translations.en
+
+  // Fetch jobs from backend
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const response = await axios.get('http://localhost:4000/api/jobs')
+        if (response.data.success) {
+          setJobs(response.data.jobs)
+        }
+      } catch (error) {
+        console.error('Error fetching jobs:', error)
+        // Silently fail - backend might not be running
+      } finally {
+        setLoadingJobs(false)
+      }
+    }
+
+    fetchJobs()
+  }, [])
 
   return (
     <>
@@ -164,11 +232,105 @@ export default function Home() {
               <MapRoute />
             </div>
 
+            {/* Jobs Section */}
+            <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
+              <h2 className="text-3xl font-semibold mb-4 text-gray-800">
+                {t.jobs}
+              </h2>
+              <p className="text-gray-700 mb-6">
+                {t.jobsDescription}
+              </p>
+              
+              {loadingJobs ? (
+                <div className="text-center py-8">
+                  <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+                  <p className="text-gray-600 mt-3">Loading jobs...</p>
+                </div>
+              ) : jobs.length > 0 ? (
+                <div className="grid gap-4 md:grid-cols-2">
+                  {jobs.map((job) => (
+                    <JobCard key={job.id} job={job} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <p>No jobs available. Make sure the backend server is running on port 4000.</p>
+                  <p className="text-sm mt-2">Run: <code className="bg-gray-100 px-2 py-1 rounded">npm run start:server</code></p>
+                </div>
+              )}
+            </div>
+
+            {/* Proof of Delivery Section */}
+            <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
+              <h2 className="text-3xl font-semibold mb-4 text-gray-800">
+                {t.proofOfDelivery}
+              </h2>
+              <p className="text-gray-700 mb-6">
+                {t.podDescription}
+              </p>
+              <button
+                onClick={() => setShowPODModal(true)}
+                className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-medium"
+              >
+                {t.openPOD}
+              </button>
+            </div>
+
             <div className="text-center text-gray-600">
               <p>Current locale: <span className="font-semibold">{locale}</span></p>
             </div>
           </div>
         </main>
+
+        {/* POD Modal */}
+        {showPODModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+                <h3 className="text-2xl font-bold text-gray-900">{t.proofOfDelivery}</h3>
+                <button
+                  onClick={() => setShowPODModal(false)}
+                  className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="p-6 space-y-8">
+                {/* Signature Section */}
+                <div>
+                  <h4 className="text-xl font-semibold mb-4 text-gray-800">{t.signature}</h4>
+                  <SignaturePad 
+                    jobId={selectedJobId} 
+                    onSuccess={(data) => {
+                      console.log('Signature saved:', data)
+                    }}
+                  />
+                </div>
+
+                {/* Photo Upload Section */}
+                <div>
+                  <h4 className="text-xl font-semibold mb-4 text-gray-800">{t.photoUpload}</h4>
+                  <PhotoUpload 
+                    jobId={selectedJobId}
+                    onSuccess={(data) => {
+                      console.log('Photo uploaded:', data)
+                    }}
+                  />
+                </div>
+
+                <div className="pt-4 border-t border-gray-200">
+                  <button
+                    onClick={() => setShowPODModal(false)}
+                    className="w-full bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition-colors"
+                  >
+                    {t.closePOD}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   )
