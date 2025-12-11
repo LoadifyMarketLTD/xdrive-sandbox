@@ -21,7 +21,8 @@ export default function Home() {
       ],
       getStarted: 'Get Started',
       documentation: 'Check out the README.md for setup instructions',
-      aboutLink: 'About Page'
+      aboutLink: 'About Page',
+      testApi: 'Test API'
     },
     fr: {
       title: 'Bienvenue sur xdrive-sandbox',
@@ -36,7 +37,8 @@ export default function Home() {
       ],
       getStarted: 'Commencer',
       documentation: 'Consultez le README.md pour les instructions de configuration',
-      aboutLink: 'Page À propos'
+      aboutLink: 'Page À propos',
+      testApi: 'Tester API'
     },
     de: {
       title: 'Willkommen bei xdrive-sandbox',
@@ -51,7 +53,8 @@ export default function Home() {
       ],
       getStarted: 'Loslegen',
       documentation: 'Siehe README.md für Einrichtungsanweisungen',
-      aboutLink: 'Über-Seite'
+      aboutLink: 'Über-Seite',
+      testApi: 'API testen'
     },
     ro: {
       title: 'Bun venit la xdrive-sandbox',
@@ -66,7 +69,8 @@ export default function Home() {
       ],
       getStarted: 'Începe',
       documentation: 'Consultă README.md pentru instrucțiuni de configurare',
-      aboutLink: 'Pagina Despre'
+      aboutLink: 'Pagina Despre',
+      testApi: 'Testează API'
     }
   }
 
@@ -130,7 +134,7 @@ export default function Home() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Test API
+                  {t.testApi}
                 </a>
               </div>
             </div>
