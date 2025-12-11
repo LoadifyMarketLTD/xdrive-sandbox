@@ -1,0 +1,52 @@
+:root{
+  --nav:#14293d;
+  --accent:#0b5e4f;
+  --card:#fff;
+  --muted:#7d8894;
+  --radius:12px;
+}
+
+*{box-sizing:border-box}
+body{font-family:Inter, system-ui, Arial; margin:0; background:#f5f7fa; color:#111}
+
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:18px 28px;
+  background:var(--nav);
+  color:#fff;
+}
+.brand{font-weight:700; font-size:20px}
+.brand span{display:block; font-size:12px; opacity:.85}
+
+.container{display:flex; gap:20px; padding:24px; max-width:1100px; margin:20px auto}
+.left{width:260px}
+.main{flex:1}
+
+.card{background:var(--card); border-radius:var(--radius); padding:18px; box-shadow:0 6px 18px rgba(16,24,40,0.05); margin-bottom:18px}
+.profile .avatar{width:80px;height:80px;border-radius:50%;background:#dfe9ee;margin-bottom:12px}
+
+.btn{padding:10px 14px;border-radius:8px;border:0; cursor:pointer}
+.btn.primary{background:#3b82f6;color:#fff}
+.btn.green{background:var(--accent); color:#fff; padding:12px 18px; font-weight:600}
+
+.jobs-list{display:flex; flex-direction:column; gap:14px}
+.job-card{display:flex; justify-content:space-between; align-items:center; padding:18px}
+.job-card .date{color:var(--muted)}
+.route{flex:1}
+.origin{font-weight:700; font-size:18px}
+.destination{color:var(--muted)}
+
+.map-card .map-placeholder{height:160px;background:linear-gradient(90deg,#e9f0f6,#fff); border-radius:10px; display:flex; align-items:center; justify-content:center; color:#7b8b98; margin-bottom:10px}
+.map-info{display:flex; align-items:center; justify-content:space-between; gap:12px}
+.addresses{display:flex; gap:16px}
+
+.form-card label{display:block; margin-bottom:10px; font-size:14px; color:var(--muted)}
+.form-card input, .form-card textarea, .form-card select{width:100%; padding:10px 12px; border-radius:8px; border:1px solid #e6e9ef; margin-top:6px}
+.form-card .row{display:flex; gap:12px}
+.footer{text-align:center; padding:18px; color:var(--muted); font-size:13px}
+@media(max-width:900px){
+  .container{flex-direction:column;padding:12px}
+  .left{width:auto}
+}
