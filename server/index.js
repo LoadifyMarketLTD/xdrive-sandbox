@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -7,10 +8,28 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+// Rate limiting configuration
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const uploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // Limit each IP to 20 uploads per windowMs
+  message: 'Too many upload requests from this IP, please try again later.',
+});
+
 // Middleware
 app.use(cors());
 app.use(express.json({ limit: '50mb' })); // For base64 signatures
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Apply rate limiting to all routes
+app.use(limiter);
 
 // Ensure upload directories exist
 const uploadDirs = [
@@ -111,7 +130,7 @@ app.post('/api/jobs', (req, res) => {
 });
 
 // Upload signature (accepts base64 or file)
-app.post('/api/upload/signature', (req, res) => {
+app.post('/api/upload/signature', uploadLimiter, (req, res) => {
   try {
     const { signature, jobId } = req.body;
     
@@ -153,7 +172,7 @@ app.post('/api/upload/signature', (req, res) => {
 });
 
 // Upload photo (multipart file)
-app.post('/api/upload/photo', uploadPhoto.single('photo'), (req, res) => {
+app.post('/api/upload/photo', uploadLimiter, uploadPhoto.single('photo'), (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({
