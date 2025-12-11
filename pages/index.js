@@ -2,10 +2,18 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
+const DEFAULT_MESSAGES = {
+  welcome: 'Welcome',
+  description: 'This is a demo page',
+  currentLocale: 'Current Locale',
+  switchLocale: 'Switch locale using the links below:',
+  features: 'Features'
+}
+
 export default function Home() {
   const router = useRouter()
   const { locale } = router
-  const [messages, setMessages] = useState({})
+  const [messages, setMessages] = useState(DEFAULT_MESSAGES)
 
   useEffect(() => {
     // Load locale messages
@@ -16,7 +24,7 @@ export default function Home() {
         setMessages(data)
       } catch (error) {
         console.error('Failed to load messages:', error)
-        setMessages({ welcome: 'Welcome', description: 'This is a demo page' })
+        setMessages(DEFAULT_MESSAGES)
       }
     }
     loadMessages()
