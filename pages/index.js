@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import LanguageSwitcher from '../components/LanguageSwitcher'
 import JobCard from '../components/JobCard'
+import API_BASE_URL from '../config/api'
 
 // Dynamically import components with no SSR (they require window/browser APIs)
 const MapRoute = dynamic(() => import('../components/MapRoute'), {
@@ -144,7 +145,7 @@ export default function Home() {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/api/jobs')
+        const response = await axios.get(`${API_BASE_URL}/api/jobs`)
         if (response.data.success) {
           setJobs(response.data.jobs)
         }

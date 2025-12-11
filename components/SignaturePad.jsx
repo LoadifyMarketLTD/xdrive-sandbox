@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import SignatureCanvas from 'react-signature-canvas'
 import axios from 'axios'
+import API_BASE_URL from '../config/api'
 
 export default function SignaturePad({ jobId, onSuccess }) {
   const sigCanvas = useRef(null)
@@ -24,7 +25,7 @@ export default function SignaturePad({ jobId, onSuccess }) {
     try {
       const signatureData = sigCanvas.current.toDataURL('image/png')
       
-      const response = await axios.post('http://localhost:4000/api/upload/signature', {
+      const response = await axios.post(`${API_BASE_URL}/api/upload/signature`, {
         signature: signatureData,
         jobId: jobId || null
       })

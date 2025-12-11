@@ -62,6 +62,9 @@ let jobs = [
   }
 ];
 
+// Counter for generating unique job IDs
+let nextJobId = 3;
+
 // Routes
 
 // Health check
@@ -90,7 +93,7 @@ app.post('/api/jobs', (req, res) => {
   }
 
   const newJob = {
-    id: jobs.length + 1,
+    id: nextJobId++,
     title,
     status: 'pending',
     collection,

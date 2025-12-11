@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import axios from 'axios'
+import API_BASE_URL from '../config/api'
 
 export default function PhotoUpload({ jobId, onSuccess }) {
   const [uploading, setUploading] = useState(false)
@@ -28,7 +29,7 @@ export default function PhotoUpload({ jobId, onSuccess }) {
       formData.append('photo', file)
       if (jobId) formData.append('jobId', jobId)
 
-      const response = await axios.post('http://localhost:4000/api/upload/photo', formData, {
+      const response = await axios.post(`${API_BASE_URL}/api/upload/photo`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
