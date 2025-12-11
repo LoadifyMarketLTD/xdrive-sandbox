@@ -12,6 +12,10 @@
 
 # production
 /build
+/dist
+
+# backup files
+*.bak
 
 # misc
 .DS_Store
