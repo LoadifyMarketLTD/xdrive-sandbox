@@ -1,7 +1,14 @@
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import LanguageSwitcher from '../components/LanguageSwitcher'
+
+// Dynamically import MapRoute with no SSR (Leaflet requires window object)
+const MapRoute = dynamic(() => import('../components/MapRoute'), {
+  ssr: false,
+  loading: () => <div className="w-full h-[400px] md:h-[500px] bg-gray-200 rounded-lg flex items-center justify-center">Loading map...</div>
+})
 
 export default function Home() {
   const router = useRouter()
@@ -22,7 +29,9 @@ export default function Home() {
       getStarted: 'Get Started',
       documentation: 'Check out the README.md for setup instructions',
       aboutLink: 'About Page',
-      testApi: 'Test API'
+      testApi: 'Test API',
+      liveTracking: 'Live Tracking',
+      trackingDescription: 'Track your shipment in real-time from collection to delivery'
     },
     fr: {
       title: 'Bienvenue sur xdrive-sandbox',
@@ -38,7 +47,9 @@ export default function Home() {
       getStarted: 'Commencer',
       documentation: 'Consultez le README.md pour les instructions de configuration',
       aboutLink: 'Page À propos',
-      testApi: 'Tester API'
+      testApi: 'Tester API',
+      liveTracking: 'Suivi en Direct',
+      trackingDescription: 'Suivez votre expédition en temps réel de la collecte à la livraison'
     },
     de: {
       title: 'Willkommen bei xdrive-sandbox',
@@ -54,7 +65,9 @@ export default function Home() {
       getStarted: 'Loslegen',
       documentation: 'Siehe README.md für Einrichtungsanweisungen',
       aboutLink: 'Über-Seite',
-      testApi: 'API testen'
+      testApi: 'API testen',
+      liveTracking: 'Live-Verfolgung',
+      trackingDescription: 'Verfolgen Sie Ihre Sendung in Echtzeit von der Abholung bis zur Lieferung'
     },
     ro: {
       title: 'Bun venit la xdrive-sandbox',
@@ -70,7 +83,9 @@ export default function Home() {
       getStarted: 'Începe',
       documentation: 'Consultă README.md pentru instrucțiuni de configurare',
       aboutLink: 'Pagina Despre',
-      testApi: 'Testează API'
+      testApi: 'Testează API',
+      liveTracking: 'Urmărire Live',
+      trackingDescription: 'Urmăriți transportul dvs. în timp real de la colectare la livrare'
     }
   }
 
@@ -137,6 +152,16 @@ export default function Home() {
                   {t.testApi}
                 </a>
               </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
+              <h2 className="text-3xl font-semibold mb-4 text-gray-800">
+                {t.liveTracking}
+              </h2>
+              <p className="text-gray-700 mb-6">
+                {t.trackingDescription}
+              </p>
+              <MapRoute />
             </div>
 
             <div className="text-center text-gray-600">
