@@ -1,5 +1,6 @@
 # dependencies
 /node_modules
+/server/node_modules
 /.pnp
 .pnp.js
 
@@ -10,8 +11,19 @@
 /.next/
 /out/
 
+# vite
+/dist
+dist-ssr
+*.local
+
 # production
 /build
+
+# uploads (demo files)
+/server/uploads/signatures/*.png
+/server/uploads/photos/*
+!/server/uploads/signatures/.gitkeep
+!/server/uploads/photos/.gitkeep
 
 # misc
 .DS_Store
@@ -24,6 +36,7 @@ yarn-error.log*
 
 # local env files
 .env*.local
+.env
 
 # vercel
 .vercel
@@ -35,3 +48,13 @@ next-env.d.ts
 # logs
 logs
 *.log
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
