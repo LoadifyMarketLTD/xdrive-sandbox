@@ -1,30 +1,38 @@
 # xdrive-sandbox
 
-A logistics marketplace demo application built with Next.js, React, and Tailwind CSS. This sandbox environment demonstrates modern web development practices including internationalization, API integration, and responsive design.
+A full-stack logistics demo application with React + Vite frontend and Express backend. Features live tracking with interactive maps, signature capture, and photo upload capabilities for proof of delivery.
 
 ## Features
 
-- **Next.js 13** - React framework with server-side rendering
-- **React 18** - Modern UI library
-- **Tailwind CSS** - Utility-first CSS framework
-- **i18n Support** - Multi-language support (English, French, German, Romanian)
-- **API Routes** - Backend API endpoints
+- **React 18 + Vite** - Fast, modern frontend development
+- **Express Backend** - RESTful API with file uploads
+- **Live Map Tracking** - Interactive route visualization using Leaflet/OpenStreetMap
+- **Proof of Delivery** - Signature capture and photo upload
+- **Mock API** - Full backend simulation with no external dependencies
 - **CI/CD** - GitHub Actions workflow for automated testing and builds
 
 ## Tech Stack
 
-- Next.js 13.5.6
+### Frontend
 - React 18.2.0
-- Tailwind CSS 3.3.5
-- PostCSS & Autoprefixer
-- ESLint
+- Vite 5.x
+- Leaflet & React-Leaflet for maps
+- React Signature Canvas for signature capture
+- React Dropzone for file uploads
+- Axios for API calls
+
+### Backend
+- Express 4.x
+- Multer for file uploads
+- CORS enabled
+- Mock job data
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 18.x or higher
-- npm or yarn
+- npm
 
 ### Installation
 
@@ -34,75 +42,128 @@ git clone https://github.com/LoadifyMarketLTD/xdrive-sandbox.git
 cd xdrive-sandbox
 ```
 
-2. Install dependencies:
+2. Install root dependencies:
 ```bash
 npm install
 ```
 
-3. Run the development server:
+3. Install server dependencies:
+```bash
+cd server
+npm install
+cd ..
+```
+
+### Running the Application
+
+#### Option 1: Run frontend and backend separately
+
+Terminal 1 - Frontend:
 ```bash
 npm run dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
+Terminal 2 - Backend:
+```bash
+npm run start:server
+```
+
+#### Option 2: Run both simultaneously
+```bash
+npm run dev:full
+```
+
+4. Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ### Available Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
+**Root package.json:**
+- `npm run dev` - Start Vite development server (frontend only)
+- `npm run build` - Build frontend for production
+- `npm run preview` - Preview production build
+- `npm run start:server` - Start Express backend
+- `npm run dev:server` - Start Express backend with nodemon (auto-reload)
+- `npm run dev:full` - Run both frontend and backend concurrently
 
-## Testing Locales
+**Server package.json:**
+- `npm start` - Start Express server
+- `npm run dev` - Start Express server with auto-reload
 
-The application supports 4 locales: English (en), French (fr), German (de), and Romanian (ro).
+## Testing the Application
 
-To test different locales:
-1. Run the development server (`npm run dev`)
-2. Use the language switcher in the navigation bar
-3. Or access directly via URL:
-   - English: http://localhost:3000/
-   - French: http://localhost:3000/fr
-   - German: http://localhost:3000/de
-   - Romanian: http://localhost:3000/ro
+Once running, verify the following features:
+
+1. **Live Tracking Map**
+   - Map displays with markers for Manchester, Birmingham, and London
+   - Route line connects the three cities
+   - Map auto-fits to show all markers
+
+2. **Job Management**
+   - Jobs list loads from `/api/jobs` endpoint
+   - If backend is unavailable, falls back to client-side mock data
+   - Click "Proof of Delivery" button on any job card
+
+3. **Proof of Delivery Modal**
+   - Draw signature with mouse/touch
+   - Signature saves to `server/uploads/signatures/` as PNG
+   - Upload photo via drag-and-drop or file picker
+   - Photo saves to `server/uploads/photos/`
+   - Both signature and photo required before POD submission
+
+4. **Backend API**
+   - `GET /api/jobs` - Returns mock job list
+   - `POST /api/jobs` - Create new job
+   - `POST /api/upload/signature` - Save signature (base64 → PNG)
+   - `POST /api/upload/photo` - Save photo (multipart upload)
 
 ## Project Structure
 
 ```
 xdrive-sandbox/
 ├── .github/
-│   ├── workflows/
-│   │   └── ci.yml
-│   └── ISSUE_TEMPLATE/
-│       ├── bug_report.md
-│       └── feature_request.md
-├── components/
-│   └── LanguageSwitcher.js
-├── pages/
-│   ├── api/
-│   │   └── hello.js
-│   ├── _app.js
-│   ├── index.js
-│   └── about.js
-├── public/
-│   └── locales/
-│       ├── en/common.json
-│       ├── fr/common.json
-│       ├── de/common.json
-│       └── ro/common.json
-├── styles/
-│   └── globals.css
-├── .gitignore
-├── next.config.js
-├── tailwind.config.js
-├── postcss.config.js
-├── package.json
+│   └── workflows/
+│       └── nodejs.yml          # CI workflow
+├── src/
+│   ├── components/
+│   │   ├── JobCard.jsx         # Job display component
+│   │   ├── MapRoute.jsx        # Leaflet map with route
+│   │   ├── SignaturePad.jsx    # Signature capture
+│   │   └── PhotoUpload.jsx     # Photo dropzone
+│   ├── App.jsx                 # Main application
+│   ├── main.jsx                # Entry point
+│   └── styles.css              # Global styles
+├── server/
+│   ├── uploads/
+│   │   ├── signatures/         # Saved signature PNGs
+│   │   └── photos/             # Uploaded photos
+│   ├── index.js                # Express server
+│   └── package.json            # Server dependencies
+├── index.html                  # Vite HTML template
+├── vite.config.js              # Vite configuration
+├── package.json                # Root dependencies
 └── README.md
 ```
 
 ## API Endpoints
 
-- `/api/hello` - Sample API endpoint that returns JSON with timestamp and locale information
+- `GET /api/jobs` - Returns list of mock jobs
+- `POST /api/jobs` - Create new job (accepts job object)
+- `POST /api/upload/signature` - Upload signature as base64 JSON
+- `POST /api/upload/photo` - Upload photo as multipart/form-data
+- `GET /health` - Server health check
+
+## Key Technologies
+
+**No API Keys Required:**
+- Uses OpenStreetMap tiles via Leaflet (free, no authentication)
+- All features work offline with mock data
+- Backend stores files locally
+
+**Map Implementation:**
+- Leaflet.js with React-Leaflet wrapper
+- OpenStreetMap tile layer
+- Route visualization between Manchester → Birmingham → London
+- Auto-fitting bounds to show all markers
 
 ## Pull Request Checklist
 
