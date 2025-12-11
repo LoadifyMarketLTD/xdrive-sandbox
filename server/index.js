@@ -83,7 +83,8 @@ app.post('/api/jobs', (req, res) => {
 })
 
 // POST /api/upload/signature - Upload signature as base64
-app.post('/api/upload/signature', (req, res) => {
+// NOTE: In production, implement rate limiting to prevent abuse
+app.post('/api/upload/signature', async (req, res) => {
   try {
     const { image } = req.body
     
@@ -99,8 +100,8 @@ app.post('/api/upload/signature', (req, res) => {
     const filename = `signature-${Date.now()}.png`
     const filepath = path.join(signaturesDir, filename)
     
-    // Save file
-    fs.writeFileSync(filepath, buffer)
+    // Save file asynchronously
+    await fs.promises.writeFile(filepath, buffer)
     
     res.json({
       success: true,
