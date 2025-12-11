@@ -1,0 +1,59 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [ main, develop, 'feat/**' ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Install frontend dependencies
+      run: npm ci
+    
+    - name: Install server dependencies
+      run: |
+        cd server
+        npm ci
+        cd ..
+    
+    - name: Lint frontend
+      run: npm run lint
+    
+    - name: Build frontend
+      run: npm run build
+    
+    - name: Test server health
+      run: |
+        cd server
+        node index.js &
+        SERVER_PID=$!
+        sleep 5
+        curl -f http://localhost:4000/health || exit 1
+        kill $SERVER_PID
+    
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-output-${{ matrix.node-version }}
+        path: .next
+        retention-days: 5
