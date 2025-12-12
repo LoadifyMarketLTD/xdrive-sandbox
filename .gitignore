@@ -19,6 +19,8 @@
 /build
 /dist
 
+# uploads
+/server/uploads
 # server uploads
 /server/uploads/
 
