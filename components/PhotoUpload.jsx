@@ -1,11 +1,7 @@
 import { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import axios from 'axios'
-
-export default function PhotoUpload({ onUploaded }) {
-  const [preview, setPreview] = useState(null)
-  const [uploading, setUploading] = useState(false)
-const API_BASE_URL = 'http://localhost:4000'
+import API_BASE_URL from '../config/api'
 
 export default function PhotoUpload({ jobId, onSuccess }) {
   const [uploading, setUploading] = useState(false)
@@ -19,32 +15,11 @@ export default function PhotoUpload({ jobId, onSuccess }) {
     
     // Create preview
     const reader = new FileReader()
-    reader.onload = () => {
     reader.onloadend = () => {
       setPreview(reader.result)
     }
     reader.readAsDataURL(file)
 
-    // Upload to server
-    try {
-      setUploading(true)
-      const formData = new FormData()
-      formData.append('photo', file)
-
-      const response = await axios.post('/api/upload/photo', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-
-      onUploaded(response.data.url)
-    } catch (error) {
-      console.error('Error uploading photo:', error)
-      alert('Failed to upload photo')
-    } finally {
-      setUploading(false)
-    }
-  }, [onUploaded])
     // Upload file
     setUploading(true)
     setMessage('')
@@ -77,33 +52,6 @@ export default function PhotoUpload({ jobId, onSuccess }) {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'image/*': ['.jpeg', '.jpg', '.png', '.gif']
-    },
-    maxFiles: 1,
-    multiple: false
-  })
-
-  return (
-    <div className="photo-upload-container">
-      <div 
-        {...getRootProps()} 
-        className={`dropzone ${isDragActive ? 'active' : ''} ${uploading ? 'uploading' : ''}`}
-      >
-        <input {...getInputProps()} />
-        {uploading ? (
-          <p>Uploading...</p>
-        ) : isDragActive ? (
-          <p>Drop the photo here...</p>
-        ) : (
-          <p>Drag & drop a photo here, or click to select</p>
-        )}
-      </div>
-      
-      {preview && (
-        <div className="photo-preview">
-          <img src={preview} alt="Preview" />
-        </div>
-      )}
       'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp']
     },
     maxFiles: 1,

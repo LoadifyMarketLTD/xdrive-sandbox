@@ -1,159 +1,238 @@
-const express = require('express')
-const cors = require('cors')
-const multer = require('multer')
-const path = require('path')
-const fs = require('fs')
+const express = require('express');
+const cors = require('cors');
+const rateLimit = require('express-rate-limit');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
-const app = express()
-const PORT = 3001
+const app = express();
+const PORT = process.env.PORT || 4000;
+
+// Rate limiting configuration
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const uploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20, // Limit each IP to 20 uploads per windowMs
+  message: 'Too many upload requests from this IP, please try again later.',
+});
 
 // Middleware
-app.use(cors())
-app.use(express.json({ limit: '10mb' }))
-app.use(express.urlencoded({ extended: true }))
+app.use(cors());
+app.use(express.json({ limit: '50mb' })); // For base64 signatures
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Create uploads directories if they don't exist
-const uploadsDir = path.join(__dirname, 'uploads')
-const signaturesDir = path.join(uploadsDir, 'signatures')
-const photosDir = path.join(uploadsDir, 'photos')
+// Apply rate limiting to all routes
+app.use(limiter);
 
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir)
-}
-if (!fs.existsSync(signaturesDir)) {
-  fs.mkdirSync(signaturesDir)
-}
-if (!fs.existsSync(photosDir)) {
-  fs.mkdirSync(photosDir)
-}
+// Ensure upload directories exist
+const uploadDirs = [
+  path.join(__dirname, 'uploads', 'signatures'),
+  path.join(__dirname, 'uploads', 'photos')
+];
 
-// Serve static files from uploads directory
-app.use('/uploads', express.static(uploadsDir))
+uploadDirs.forEach(dir => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+});
 
-// Configure multer for photo uploads
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, photosDir)
+// Multer configuration for photo uploads
+const photoStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, 'uploads', 'photos'));
   },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-    cb(null, 'photo-' + uniqueSuffix + path.extname(file.originalname))
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'photo-' + uniqueSuffix + path.extname(file.originalname));
   }
-})
+});
 
-const upload = multer({ 
-  storage: storage,
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = /jpeg|jpg|png|gif/
-    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase())
-    const mimetype = allowedTypes.test(file.mimetype)
-    
-    if (mimetype && extname) {
-      return cb(null, true)
-    } else {
-      cb(new Error('Only image files are allowed'))
-    }
-  }
-})
+const uploadPhoto = multer({ 
+  storage: photoStorage,
+  limits: { fileSize: 10 * 1024 * 1024 } // 10MB limit
+});
 
-// In-memory storage for jobs (in production, use a database)
+// Mock jobs database
 let jobs = [
   {
-    id: '1',
-    title: 'Delivery Job 1',
-    origin: 'Manchester',
-    destination: 'London',
-    status: 'In Transit'
+    id: 1,
+    title: 'Manchester to London Delivery',
+    status: 'in_transit',
+    collection: 'Manchester',
+    delivery: 'London',
+    date: new Date().toISOString(),
+    driver: 'John Smith'
+  },
+  {
+    id: 2,
+    title: 'Birmingham to Edinburgh',
+    status: 'pending',
+    collection: 'Birmingham',
+    delivery: 'Edinburgh',
+    date: new Date().toISOString(),
+    driver: 'Jane Doe'
   }
-]
+];
+
+// Counter for generating unique job IDs
+let nextJobId = 3;
 
 // Routes
 
 // Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Server is running' })
-})
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
 // Get all jobs
 app.get('/api/jobs', (req, res) => {
-  res.json(jobs)
-})
+  res.json({
+    success: true,
+    jobs: jobs,
+    count: jobs.length
+  });
+});
 
 // Create a new job
 app.post('/api/jobs', (req, res) => {
-  const newJob = {
-    id: req.body.id || Date.now().toString(),
-    title: req.body.title || 'New Job',
-    origin: req.body.origin || 'Origin',
-    destination: req.body.destination || 'Destination',
-    status: req.body.status || 'Pending'
-  }
+  const { title, collection, delivery, driver } = req.body;
   
-  jobs.push(newJob)
-  res.status(201).json(newJob)
-})
-
-// Upload signature (base64 image)
-// NOTE: In production, implement rate limiting (e.g., express-rate-limit) to prevent abuse
-app.post('/api/upload/signature', (req, res) => {
-  try {
-    const { image, jobId } = req.body
-    
-    if (!image) {
-      return res.status(400).json({ error: 'No signature image provided' })
-    }
-    
-    // Extract base64 data
-    const base64Data = image.replace(/^data:image\/\w+;base64,/, '')
-    const buffer = Buffer.from(base64Data, 'base64')
-    
-    // Generate filename
-    const filename = `signature-${jobId || Date.now()}.png`
-    const filepath = path.join(signaturesDir, filename)
-    
-    // Save file
-    fs.writeFileSync(filepath, buffer)
-    
-    res.json({ 
-      success: true, 
-      url: `/uploads/signatures/${filename}`,
-      message: 'Signature uploaded successfully'
-    })
-  } catch (error) {
-    console.error('Error uploading signature:', error)
-    res.status(500).json({ error: 'Failed to upload signature' })
+  if (!title || !collection || !delivery) {
+    return res.status(400).json({
+      success: false,
+      error: 'Missing required fields: title, collection, delivery'
+    });
   }
-})
 
-// Upload photo (multipart form data)
-// NOTE: In production, implement rate limiting (e.g., express-rate-limit) to prevent abuse
-app.post('/api/upload/photo', upload.single('photo'), (req, res) => {
+  const newJob = {
+    id: nextJobId++,
+    title,
+    status: 'pending',
+    collection,
+    delivery,
+    date: new Date().toISOString(),
+    driver: driver || 'Unassigned'
+  };
+
+  jobs.push(newJob);
+
+  res.status(201).json({
+    success: true,
+    job: newJob
+  });
+});
+
+// Upload signature (accepts base64 or file)
+app.post('/api/upload/signature', uploadLimiter, (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ error: 'No photo provided' })
-    }
+    const { signature, jobId } = req.body;
     
+    if (!signature) {
+      return res.status(400).json({
+        success: false,
+        error: 'No signature data provided'
+      });
+    }
+
+    // Handle base64 signature
+    let base64Data = signature;
+    
+    // Remove data URL prefix if present
+    if (base64Data.includes('base64,')) {
+      base64Data = base64Data.split('base64,')[1];
+    }
+
+    const fileName = `signature-${jobId || Date.now()}-${Math.round(Math.random() * 1E9)}.png`;
+    const filePath = path.join(__dirname, 'uploads', 'signatures', fileName);
+
+    // Save base64 to file
+    fs.writeFileSync(filePath, base64Data, 'base64');
+
     res.json({
       success: true,
-      url: `/uploads/photos/${req.file.filename}`,
-      filename: req.file.filename,
-      message: 'Photo uploaded successfully'
-    })
+      message: 'Signature uploaded successfully',
+      filename: fileName,
+      path: `/uploads/signatures/${fileName}`
+    });
   } catch (error) {
-    console.error('Error uploading photo:', error)
-    res.status(500).json({ error: 'Failed to upload photo' })
+    console.error('Signature upload error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to upload signature',
+      details: error.message
+    });
   }
-})
+});
 
-// Error handling middleware
+// Upload photo (multipart file)
+app.post('/api/upload/photo', uploadLimiter, uploadPhoto.single('photo'), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        error: 'No photo file provided'
+      });
+    }
+
+    const { jobId } = req.body;
+
+    res.json({
+      success: true,
+      message: 'Photo uploaded successfully',
+      filename: req.file.filename,
+      path: `/uploads/photos/${req.file.filename}`,
+      size: req.file.size,
+      jobId: jobId || null
+    });
+  } catch (error) {
+    console.error('Photo upload error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to upload photo',
+      details: error.message
+    });
+  }
+});
+
+// Serve uploaded files statically (for testing/viewing)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({
+    success: false,
+    error: 'Endpoint not found',
+    path: req.path
+  });
+});
+
+// Error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack)
-  res.status(500).json({ error: err.message || 'Something went wrong!' })
-})
+  console.error('Server error:', err);
+  res.status(500).json({
+    success: false,
+    error: 'Internal server error',
+    details: err.message
+  });
+});
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`✓ Server running on http://localhost:${PORT}`)
-  console.log(`✓ Uploads directory: ${uploadsDir}`)
-})
+  console.log(`✅ XDrive backend server running on http://localhost:${PORT}`);
+  console.log(`📁 Uploads saved to: ${path.join(__dirname, 'uploads')}`);
+  console.log(`\nAvailable endpoints:`);
+  console.log(`  GET  /health`);
+  console.log(`  GET  /api/jobs`);
+  console.log(`  POST /api/jobs`);
+  console.log(`  POST /api/upload/signature`);
+  console.log(`  POST /api/upload/photo`);
+});
+
+module.exports = app;

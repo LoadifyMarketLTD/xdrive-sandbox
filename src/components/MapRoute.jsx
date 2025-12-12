@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { MapContainer, TileLayer, Marker, Polyline, useMap } from 'react-leaflet'
 import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
 
 // Fix for default marker icons in react-leaflet
 delete L.Icon.Default.prototype._getIconUrl
@@ -8,6 +9,9 @@ L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+  iconRetinaUrl: '/leaflet/marker-icon-2x.png',
+  iconUrl: '/leaflet/marker-icon.png',
+  shadowUrl: '/leaflet/marker-shadow.png',
 })
 
 // Component to fit bounds after map renders
@@ -36,6 +40,11 @@ export default function MapRoute() {
   
   // Route coordinates for the polyline: Manchester → Birmingham → London
   const routeCoordinates = [manchesterCoords, birminghamCoords, londonCoords]
+  // London (delivery point)
+  const londonCoords = [51.5074, -0.1278]
+  
+  // Route coordinates for the polyline
+  const routeCoordinates = [manchesterCoords, londonCoords]
   
   // Blue color for the route line
   const blueLineOptions = { color: '#3B82F6', weight: 4 }
@@ -44,6 +53,9 @@ export default function MapRoute() {
     <div className="map-container">
       <MapContainer
         center={birminghamCoords}
+    <div className="w-full h-[400px] md:h-[500px] rounded-lg overflow-hidden shadow-lg">
+      <MapContainer
+        center={[52.4862, -1.1904]} // Center between Manchester and London
         zoom={6}
         scrollWheelZoom={true}
         style={{ height: '100%', width: '100%' }}
@@ -66,6 +78,13 @@ export default function MapRoute() {
         <Polyline positions={routeCoordinates} pathOptions={blueLineOptions} />
         
         {/* Fit bounds to show all markers */}
+        {/* Delivery point marker (London) */}
+        <Marker position={londonCoords} title="Delivery: London" />
+        
+        {/* Route polyline connecting the two points */}
+        <Polyline positions={routeCoordinates} pathOptions={blueLineOptions} />
+        
+        {/* Fit bounds to show both markers */}
         <FitBounds positions={routeCoordinates} />
       </MapContainer>
     </div>
