@@ -11,12 +11,18 @@
 /.next/
 /out/
 
+# vite
+/dist
+.vite
+
 # production
 /build
 /dist
 
 # uploads
 /server/uploads
+# server uploads
+/server/uploads/
 
 # misc
 .DS_Store
@@ -40,3 +46,7 @@ next-env.d.ts
 # logs
 logs
 *.log
+
+# server
+/server/node_modules
+/server/uploads
