@@ -45,7 +45,7 @@ A logistics marketplace demo application built with Vite, React, and Leaflet. Th
 ### Prerequisites
 
 - Node.js 18.x or higher
-- npm or yarn
+- npm
 
 ### Installation
 
@@ -57,7 +57,9 @@ cd xdrive-sandbox
 
 2. Install frontend dependencies:
 ```bash
+cd server
 npm install
+cd ..
 ```
 
 3. Install backend dependencies:
@@ -249,9 +251,12 @@ No environment variables or API keys are required for this demo. All services us
 - Delete `node_modules` and `package-lock.json`, then run `npm install` again
 - Ensure you have Node.js 18.x or higher installed
 
-## Pull Request Checklist
+**Issue**: Map tiles not loading
+- Check your internet connection (tiles are loaded from OpenStreetMap)
 
-Before submitting a pull request, ensure:
+**Issue**: File uploads failing
+- Ensure the server is running on port 3001
+- Check that the `server/uploads/` directory exists
 
 - [ ] Code follows the project's coding standards
 - [ ] All tests pass (`npm run build` succeeds)
