@@ -1,54 +1,7 @@
-import React, { useState, useCallback } from 'react';
-import { useDropzone } from 'react-dropzone';
-import axios from 'axios';
-
-function PhotoUpload({ jobId }) {
-  const [preview, setPreview] = useState(null);
-  const [uploading, setUploading] = useState(false);
-  const [uploadSuccess, setUploadSuccess] = useState(false);
-
-  const onDrop = useCallback(async (acceptedFiles) => {
-    const file = acceptedFiles[0];
-    if (!file) return;
-
-    // Create preview
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreview(reader.result);
-    };
-    reader.readAsDataURL(file);
-
-    // Upload to server
-    setUploading(true);
-    setUploadSuccess(false);
-    
-    try {
-      const formData = new FormData();
-      formData.append('photo', file);
-      formData.append('jobId', jobId);
-
-      await axios.post('http://localhost:3001/api/upload/photo', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      setUploadSuccess(true);
-      alert('Photo uploaded successfully!');
-    } catch (error) {
-      console.error('Error uploading photo:', error);
-      alert('Failed to upload photo. Server may not be running.');
-    } finally {
-      setUploading(false);
-    }
-  }, [jobId]);
 import { useState, useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
 import axios from 'axios'
 
-export default function PhotoUpload({ onUploaded }) {
-  const [preview, setPreview] = useState(null)
-  const [uploading, setUploading] = useState(false)
 const API_BASE_URL = 'http://localhost:4000'
 
 export default function PhotoUpload({ jobId, onSuccess }) {
@@ -60,36 +13,13 @@ export default function PhotoUpload({ jobId, onSuccess }) {
     if (acceptedFiles.length === 0) return
 
     const file = acceptedFiles[0]
-    
-    // Create preview
+
     const reader = new FileReader()
-    reader.onload = () => {
     reader.onloadend = () => {
       setPreview(reader.result)
     }
     reader.readAsDataURL(file)
 
-    // Upload to server
-    try {
-      setUploading(true)
-      const formData = new FormData()
-      formData.append('photo', file)
-
-      const response = await axios.post('/api/upload/photo', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      })
-
-      onUploaded(response.data.url)
-    } catch (error) {
-      console.error('Error uploading photo:', error)
-      alert('Failed to upload photo')
-    } finally {
-      setUploading(false)
-    }
-  }, [onUploaded])
-    // Upload file
     setUploading(true)
     setMessage('')
 
@@ -121,37 +51,6 @@ export default function PhotoUpload({ jobId, onSuccess }) {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'image/*': ['.png', '.jpg', '.jpeg', '.gif'],
-    },
-    multiple: false,
-  });
-      'image/*': ['.jpeg', '.jpg', '.png', '.gif']
-    },
-    maxFiles: 1,
-    multiple: false
-  })
-
-  return (
-    <div className="photo-upload-container">
-      <div 
-        {...getRootProps()} 
-        className={`dropzone ${isDragActive ? 'active' : ''} ${uploading ? 'uploading' : ''}`}
-      >
-        <input {...getInputProps()} />
-        {uploading ? (
-          <p>Uploading...</p>
-        ) : isDragActive ? (
-          <p>Drop the photo here...</p>
-        ) : (
-          <p>Drag & drop a photo here, or click to select</p>
-        )}
-      </div>
-      
-      {preview && (
-        <div className="photo-preview">
-          <img src={preview} alt="Preview" />
-        </div>
-      )}
       'image/*': ['.png', '.jpg', '.jpeg', '.gif', '.webp']
     },
     maxFiles: 1,
@@ -164,38 +63,22 @@ export default function PhotoUpload({ jobId, onSuccess }) {
   }
 
   return (
-    <div className="photo-upload-container">
+    <div>
       <div
         {...getRootProps()}
-        className={`dropzone ${isDragActive ? 'dropzone-active' : ''}`}
-      >
-        <input {...getInputProps()} />
-        {preview ? (
-          <div className="photo-preview">
-            <img src={preview} alt="Preview" />
-            {uploadSuccess && <div className="upload-success">✓ Uploaded</div>}
-          </div>
-        ) : (
-          <div className="dropzone-content">
-            {uploading ? (
-              <p>Uploading...</p>
-            ) : isDragActive ? (
-              <p>Drop the photo here...</p>
-            ) : (
-              <p>Drag & drop a photo here, or click to select</p>
         className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
-          isDragActive 
-            ? 'border-blue-500 bg-blue-50' 
+          isDragActive
+            ? 'border-blue-500 bg-blue-50'
             : 'border-gray-300 bg-gray-50 hover:border-gray-400'
         } ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
         <input {...getInputProps()} />
-        
+
         {preview ? (
           <div className="space-y-3">
-            <img 
-              src={preview} 
-              alt="Preview" 
+            <img
+              src={preview}
+              alt="Preview"
               className="max-h-48 mx-auto rounded-lg shadow-md"
             />
             <button
@@ -210,17 +93,17 @@ export default function PhotoUpload({ jobId, onSuccess }) {
           </div>
         ) : (
           <div>
-            <svg 
-              className="mx-auto h-12 w-12 text-gray-400 mb-3" 
-              stroke="currentColor" 
-              fill="none" 
+            <svg
+              className="mx-auto h-12 w-12 text-gray-400 mb-3"
+              stroke="currentColor"
+              fill="none"
               viewBox="0 0 48 48"
             >
-              <path 
-                d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" 
-                strokeWidth="2" 
-                strokeLinecap="round" 
-                strokeLinejoin="round" 
+              <path
+                d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               />
             </svg>
             {isDragActive ? (
@@ -238,11 +121,6 @@ export default function PhotoUpload({ jobId, onSuccess }) {
           </div>
         )}
       </div>
-    </div>
-  );
-}
-
-export default PhotoUpload;
 
       {uploading && (
         <div className="mt-4 text-center">

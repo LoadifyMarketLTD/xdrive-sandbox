@@ -1,142 +1,20 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import JobCard from './components/JobCard';
-import MapRoute from './components/MapRoute';
-import SignaturePad from './components/SignaturePad';
-import PhotoUpload from './components/PhotoUpload';
-
-const mockJobs = [
-  {
-    id: 1,
-    title: 'Delivery to Birmingham',
-    customer: 'ABC Corp',
-    status: 'In Progress',
-    destination: 'Birmingham, UK',
-  },
-  {
-    id: 2,
-    title: 'Pickup from Manchester',
-    customer: 'XYZ Ltd',
-    status: 'Pending',
-    destination: 'Manchester, UK',
-  },
-  {
-    id: 3,
-    title: 'Express to London',
-    customer: 'Quick Logistics',
-    status: 'Completed',
-    destination: 'London, UK',
-  },
-];
-
-function App() {
-  const [jobs, setJobs] = useState([]);
-  const [selectedJob, setSelectedJob] = useState(null);
-  const [showPodModal, setShowPodModal] = useState(false);
-  const [signature, setSignature] = useState(null);
-  const [serverAvailable, setServerAvailable] = useState(true);
-
-  useEffect(() => {
-    fetchJobs();
-  }, []);
-
-  const fetchJobs = async () => {
-    try {
-      const response = await axios.get('http://localhost:3001/api/jobs', {
-        timeout: 2000,
-      });
-      setJobs(response.data);
-      setServerAvailable(true);
-    } catch (error) {
-      console.log('Server not available, using mock data');
-      setJobs(mockJobs);
-      setServerAvailable(false);
-    }
-  };
-
-  const handleProofOfDelivery = (job) => {
-    setSelectedJob(job);
-    setShowPodModal(true);
-  };
-
-  const handleSignatureSaved = (signatureData) => {
-    setSignature(signatureData);
-  };
-
-  const handleSubmitPod = async () => {
-    if (!signature) {
-      alert('Please provide a signature');
-      return;
-    }
-
-    try {
-      if (serverAvailable) {
-        await axios.post('http://localhost:3001/api/upload/signature', {
-          image: signature,
-          jobId: selectedJob.id,
-        });
-      }
-      alert('Proof of Delivery submitted successfully!');
-      setShowPodModal(false);
-      setSignature(null);
-      setSelectedJob(null);
-    } catch (error) {
-      console.error('Error submitting POD:', error);
-      alert('Failed to submit Proof of Delivery');
-    }
-  };
-
-  const handleClosePodModal = () => {
-    setShowPodModal(false);
-    setSignature(null);
-    setSelectedJob(null);
-  };
-
-  return (
-    <div className="app">
-      <header className="app-header">
-        <h1>XDrive - Logistics Platform</h1>
-        {!serverAvailable && (
-          <div className="warning-banner">
-            ⚠️ Backend server not available - using mock data
-          </div>
-        )}
-      </header>
-
-      <div className="app-content">
-        <section className="jobs-section">
-          <h2>Active Jobs</h2>
-          <div className="jobs-list">
-            {jobs.map((job) => (
-              <JobCard
-                key={job.id}
-                job={job}
-                onProofOfDelivery={handleProofOfDelivery}
-              />
-            ))}
-          </div>
-        </section>
-
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import MapRoute from './components/MapRoute'
 import JobCard from './components/JobCard'
 import SignaturePad from './components/SignaturePad'
 import PhotoUpload from './components/PhotoUpload'
+import PlaceBid from './components/PlaceBid'
 
-function App() {
-  const [jobs, setJobs] = useState([])
-  const [showPODModal, setShowPODModal] = useState(false)
-  const [selectedJob, setSelectedJob] = useState(null)
-  const [signature, setSignature] = useState(null)
-  const [photo, setPhoto] = useState(null)
 const API_BASE_URL = 'http://localhost:4000'
 
 export default function App() {
   const [jobs, setJobs] = useState([])
   const [loading, setLoading] = useState(true)
   const [showModal, setShowModal] = useState(false)
-  const [selectedJobId, setSelectedJobId] = useState(null)
+  const [selectedJob, setSelectedJob] = useState(null)
+  const [showBidModal, setShowBidModal] = useState(false)
+  const [bidJobId, setBidJobId] = useState(null)
 
   useEffect(() => {
     fetchJobs()
@@ -144,179 +22,6 @@ export default function App() {
 
   const fetchJobs = async () => {
     try {
-      const response = await axios.get('/api/jobs')
-      setJobs(response.data)
-    } catch (error) {
-      console.error('Error fetching jobs:', error)
-    }
-  }
-
-  const handleOpenPOD = (job) => {
-    setSelectedJob(job)
-    setShowPODModal(true)
-    setSignature(null)
-    setPhoto(null)
-  }
-
-  const handleClosePOD = () => {
-    setShowPODModal(false)
-    setSelectedJob(null)
-    setSignature(null)
-    setPhoto(null)
-  }
-
-  const handleSignatureSaved = (signatureData) => {
-    setSignature(signatureData)
-  }
-
-  const handlePhotoUploaded = (photoUrl) => {
-    setPhoto(photoUrl)
-  }
-
-  const handleSubmitPOD = async () => {
-    if (!signature) {
-      alert('Please provide a signature')
-      return
-    }
-
-    try {
-      // Upload signature
-      await axios.post('/api/upload/signature', {
-        image: signature,
-        jobId: selectedJob?.id
-      })
-
-      alert('Proof of Delivery submitted successfully!')
-      handleClosePOD()
-    } catch (error) {
-      console.error('Error submitting POD:', error)
-      alert('Failed to submit Proof of Delivery')
-    }
-  }
-
-  return (
-    <div className="app">
-      <header className="header">
-        <h1>XDrive Sandbox - Full UI Stack</h1>
-        <p>Map, Signature, Photo Upload, Backend Integration</p>
-      </header>
-
-      <main className="main-content">
-        <section className="map-section">
-          <h2>Live Tracking</h2>
-          <MapRoute />
-        </section>
-      </div>
-
-      {showPodModal && (
-        <div className="modal-overlay" onClick={handleClosePodModal}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>Proof of Delivery</h2>
-              <button className="close-button" onClick={handleClosePodModal}>
-                ×
-              </button>
-            </div>
-            <div className="modal-body">
-              <div className="pod-section">
-                <h3>Job: {selectedJob?.title}</h3>
-                <p>Customer: {selectedJob?.customer}</p>
-              </div>
-
-        <section className="jobs-section">
-          <h2>Jobs List</h2>
-          <div className="jobs-list">
-            {jobs.length === 0 ? (
-              <p>No jobs available. Click "Add Sample Job" to create one.</p>
-            ) : (
-              jobs.map((job) => (
-                <JobCard
-                  key={job.id}
-                  job={job}
-                  onOpenPOD={() => handleOpenPOD(job)}
-                />
-              ))
-            )}
-          </div>
-          <button 
-            className="btn btn-primary"
-            onClick={async () => {
-              try {
-                await axios.post('/api/jobs', {
-                  id: Date.now().toString(),
-                  title: `Delivery Job ${jobs.length + 1}`,
-                  origin: 'Manchester',
-                  destination: 'London',
-                  status: 'In Transit'
-                })
-                fetchJobs()
-              } catch (error) {
-                console.error('Error adding job:', error)
-              }
-            }}
-          >
-            Add Sample Job
-          </button>
-        </section>
-      </main>
-
-      {/* Proof of Delivery Modal */}
-      {showPODModal && (
-        <div className="modal-overlay" onClick={handleClosePOD}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>Proof of Delivery</h2>
-              <button className="close-btn" onClick={handleClosePOD}>
-                ×
-              </button>
-            </div>
-            
-            <div className="modal-body">
-              {selectedJob && (
-                <div className="job-details">
-                  <h3>{selectedJob.title}</h3>
-                  <p>From: {selectedJob.origin} → To: {selectedJob.destination}</p>
-                  <p>Status: {selectedJob.status}</p>
-                </div>
-              )}
-
-              <div className="pod-section">
-                <h3>Signature</h3>
-                <SignaturePad onSaved={handleSignatureSaved} />
-              </div>
-
-              <div className="pod-section">
-                <h3>Photo Upload</h3>
-                <PhotoUpload jobId={selectedJob?.id} />
-              </div>
-
-              <div className="modal-actions">
-                <button className="button-secondary" onClick={handleClosePodModal}>
-                  Cancel
-                </button>
-                <button className="button-primary" onClick={handleSubmitPod}>
-                  Submit POD
-                </button>
-              </div>
-            </div>
-                <h3>Photo Upload (Optional)</h3>
-                <PhotoUpload onUploaded={handlePhotoUploaded} />
-                {photo && (
-                  <p className="success-message">Photo uploaded successfully!</p>
-                )}
-              </div>
-            </div>
-
-            <div className="modal-footer">
-              <button className="btn btn-secondary" onClick={handleClosePOD}>
-                Cancel
-              </button>
-              <button 
-                className="btn btn-primary" 
-                onClick={handleSubmitPOD}
-                disabled={!signature}
-              >
-                Submit POD
       const response = await axios.get(`${API_BASE_URL}/api/jobs`)
       if (response.data.success) {
         setJobs(response.data.jobs)
@@ -328,14 +33,24 @@ export default function App() {
     }
   }
 
-  const handleOpenModal = (jobId = null) => {
-    setSelectedJobId(jobId)
+  const handleOpenModal = (job = null) => {
+    setSelectedJob(job)
     setShowModal(true)
   }
 
   const handleCloseModal = () => {
     setShowModal(false)
-    setSelectedJobId(null)
+    setSelectedJob(null)
+  }
+
+  const handleOpenBidModal = (jobId) => {
+    setBidJobId(jobId)
+    setShowBidModal(true)
+  }
+
+  const handleCloseBidModal = () => {
+    setShowBidModal(false)
+    setBidJobId(null)
   }
 
   return (
@@ -391,82 +106,20 @@ export default function App() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {jobs.map((job) => (
-                <JobCard key={job.id} job={job} />
+                <div key={job.id}>
+                  <JobCard job={job} />
+                  <button
+                    onClick={() => handleOpenBidModal(job.id)}
+                    className="mt-2 w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                  >
+                    Place Bid
+                  </button>
+                </div>
               ))}
             </div>
           )}
         </section>
-
-        {/* Features Section */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Features</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Live Map</h3>
-              <p className="text-gray-600 text-sm">
-                Interactive route visualization with OpenStreetMap
-              </p>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Signature Capture</h3>
-              <p className="text-gray-600 text-sm">
-                Digital signature pad for proof of delivery
-              </p>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Photo Upload</h3>
-              <p className="text-gray-600 text-sm">
-                Drag-and-drop photo upload with preview
-              </p>
-            </div>
-
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-                <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Job Management</h3>
-              <p className="text-gray-600 text-sm">
-                Track and manage delivery jobs in real-time
-              </p>
-            </div>
-          </div>
-        </section>
       </main>
-
-      {/* Footer */}
-      <footer className="bg-gray-800 text-white mt-12">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <p className="text-gray-400 text-sm">
-              © 2024 XDrive Logistics. Full Stack UI Mock Demo.
-            </p>
-            <div className="flex gap-4 mt-4 md:mt-0">
-              <span className="text-gray-400 text-sm">Vite + React + Leaflet</span>
-              <span className="text-gray-600">•</span>
-              <span className="text-gray-400 text-sm">No API Keys Required</span>
-            </div>
-          </div>
-        </div>
-      </footer>
 
       {/* Proof of Delivery Modal */}
       {showModal && (
@@ -485,24 +138,22 @@ export default function App() {
             </div>
 
             <div className="p-6 space-y-8">
-              {/* Signature Section */}
               <div>
                 <h4 className="text-lg font-semibold text-gray-900 mb-4">
                   📝 Signature Capture
                 </h4>
-                <SignaturePad 
-                  jobId={selectedJobId} 
+                <SignaturePad
+                  jobId={selectedJob?.id}
                   onSuccess={(data) => console.log('Signature saved:', data)}
                 />
               </div>
 
-              {/* Photo Upload Section */}
               <div>
                 <h4 className="text-lg font-semibold text-gray-900 mb-4">
                   📸 Photo Upload
                 </h4>
-                <PhotoUpload 
-                  jobId={selectedJobId}
+                <PhotoUpload
+                  jobId={selectedJob?.id}
                   onSuccess={(data) => console.log('Photo uploaded:', data)}
                 />
               </div>
@@ -519,12 +170,28 @@ export default function App() {
           </div>
         </div>
       )}
-    </div>
-  );
-}
 
-export default App;
+      {/* Place Bid Modal */}
+      {showBidModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full">
+            <div className="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+              <h3 className="text-xl font-bold text-gray-900">Place a Bid</h3>
+              <button
+                onClick={handleCloseBidModal}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6">
+              <PlaceBid jobId={bidJobId} onBidPlaced={handleCloseBidModal} />
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
-
-export default App
