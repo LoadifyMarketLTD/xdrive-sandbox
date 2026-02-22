@@ -5,6 +5,10 @@ import JobCard from './components/JobCard'
 import SignaturePad from './components/SignaturePad'
 import PhotoUpload from './components/PhotoUpload'
 import PlaceBid from './components/PlaceBid'
+import PaymentSelector from './components/payments/PaymentSelector'
+import AdminPayments from './components/payments/AdminPayments'
+import CookieConsent from './components/legal/CookieConsent'
+import DeleteAccount from './components/legal/DeleteAccount'
 
 const API_BASE_URL = 'http://localhost:4000'
 
@@ -15,6 +19,10 @@ export default function App() {
   const [selectedJob, setSelectedJob] = useState(null)
   const [showBidModal, setShowBidModal] = useState(false)
   const [bidJobId, setBidJobId] = useState(null)
+  const [showPaymentModal, setShowPaymentModal] = useState(false)
+  const [paymentJobId, setPaymentJobId] = useState(null)
+  const [showAdminModal, setShowAdminModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
 
   useEffect(() => {
     fetchJobs()
@@ -53,13 +61,39 @@ export default function App() {
     setBidJobId(null)
   }
 
+  const handleOpenPaymentModal = (jobId) => {
+    setPaymentJobId(jobId)
+    setShowPaymentModal(true)
+  }
+
+  const handleClosePaymentModal = () => {
+    setShowPaymentModal(false)
+    setPaymentJobId(null)
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-blue-600 text-white shadow-lg">
-        <div className="container mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold">XDrive Logistics</h1>
-          <p className="text-blue-100 mt-1">Full Stack UI Mock - Vite + React</p>
+        <div className="container mx-auto px-4 py-6 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">XDrive Logistics</h1>
+            <p className="text-blue-100 mt-1">Full Stack UI Mock - Vite + React</p>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowAdminModal(true)}
+              className="px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-colors text-sm font-medium"
+            >
+              🏦 Admin Payments
+            </button>
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors text-sm font-medium"
+            >
+              🗑 Delete Account
+            </button>
+          </div>
         </div>
       </header>
 
@@ -108,12 +142,20 @@ export default function App() {
               {jobs.map((job) => (
                 <div key={job.id}>
                   <JobCard job={job} />
-                  <button
-                    onClick={() => handleOpenBidModal(job.id)}
-                    className="mt-2 w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
-                  >
-                    Place Bid
-                  </button>
+                  <div className="flex gap-2 mt-2">
+                    <button
+                      onClick={() => handleOpenBidModal(job.id)}
+                      className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                    >
+                      Place Bid
+                    </button>
+                    <button
+                      onClick={() => handleOpenPaymentModal(job.id)}
+                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                    >
+                      💳 Pay
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -192,6 +234,58 @@ export default function App() {
           </div>
         </div>
       )}
+
+      {/* Payment Modal */}
+      {showPaymentModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-lg w-full">
+            <div className="border-b border-gray-200 px-6 py-4 flex items-center justify-between">
+              <h3 className="text-xl font-bold text-gray-900">Payment</h3>
+              <button
+                onClick={handleClosePaymentModal}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6">
+              <PaymentSelector
+                jobId={paymentJobId}
+                amount={250}
+                onSuccess={handleClosePaymentModal}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Admin Payments Modal */}
+      {showAdminModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <AdminPayments onClose={() => setShowAdminModal(false)} />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Account Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="w-full max-w-md">
+            <DeleteAccount
+              onDeleted={() => setShowDeleteModal(false)}
+              onCancel={() => setShowDeleteModal(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Cookie Consent Banner */}
+      <CookieConsent />
     </div>
   )
 }
